@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityEventTypes="typeWindowContentChanged|typeWindowStateChanged|typeNotificationStateChanged"
     android:accessibilityFeedbackType="feedbackGeneric"
-    android:accessibilityFlags="flagDefault"
+    android:accessibilityFlags="flagDefault|flagIncludeNotImportantViews|flagRetrieveInteractiveWindows"
     android:canRetrieveWindowContent="true"
-    android:description="@string/app_name"
-    android:packageNames="com.android.settings" />
+    android:canPerformGestures="true"
+    android:packageNames="com.spotify.music"
+    android:notificationTimeout="100" />
