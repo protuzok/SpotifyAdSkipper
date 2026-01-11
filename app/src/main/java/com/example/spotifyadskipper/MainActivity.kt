@@ -8,18 +8,22 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Встановлюємо наш XML макет
         setContentView(R.layout.activity_main)
 
         val btn = findViewById<Button>(R.id.btnToggle)
+        val btnAcc = findViewById<Button>(R.id.btnAccessibility) // Знаходимо нову кнопку
 
-        // Оновлюємо вигляд кнопки відповідно до стану AppConfig
         updateButtonUI(btn)
 
         btn.setOnClickListener {
-            // Змінюємо стан: якщо було true -> стане false, і навпаки
             AppConfig.isEnabled = !AppConfig.isEnabled
             updateButtonUI(btn)
+        }
+
+        // Логіка для переходу в налаштування
+        btnAcc.setOnClickListener {
+            val intent = android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
+            startActivity(intent)
         }
     }
 
