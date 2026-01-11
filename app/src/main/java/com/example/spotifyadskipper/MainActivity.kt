@@ -12,6 +12,7 @@ class MainActivity : AppCompatActivity() {
 
         val btn = findViewById<Button>(R.id.btnToggle)
         val btnAcc = findViewById<Button>(R.id.btnAccessibility) // Знаходимо нову кнопку
+        val btnSpotify = findViewById<Button>(R.id.btnOpenSpotify)
 
         updateButtonUI(btn)
 
@@ -24,6 +25,22 @@ class MainActivity : AppCompatActivity() {
         btnAcc.setOnClickListener {
             val intent = android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
             startActivity(intent)
+        }
+
+        btnSpotify.setOnClickListener {
+            val packageName = "com.spotify.music" // Стандартне ім'я пакета Spotify
+            val intent = packageManager.getLaunchIntentForPackage(packageName)
+
+            if (intent != null) {
+                startActivity(intent)
+            } else {
+                // Якщо додаток не встановлено, можна відкрити його в Play Store
+                val marketIntent = android.content.Intent(
+                    android.content.Intent.ACTION_VIEW,
+                    android.net.Uri.parse("market://details?id=$packageName")
+                )
+                startActivity(marketIntent)
+            }
         }
     }
 

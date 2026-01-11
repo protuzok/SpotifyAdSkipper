@@ -86,7 +86,7 @@ class AutomationService : AccessibilityService() {
     }
 
     private fun skipToNextTrack() {
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val eventTime = SystemClock.uptimeMillis()
 
         // Емуляція натискання клавіші "Наступний трек"
