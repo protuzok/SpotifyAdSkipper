@@ -46,15 +46,18 @@ class AutomationService : AccessibilityService() {
     }
 
     private fun goBackAndRestart() {
-        // Робимо невелику паузу перед "Назад", щоб система зафіксувала клік по ОК
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
             performGlobalAction(GLOBAL_ACTION_BACK)
 
             Thread {
-                Thread.sleep(1000)
-                restartMusic()
+                Thread.sleep(1000) // Чекаємо, поки система "прокинеться"
+                restartMusic()     // Запускаємо відтворення
 
-                // Другий раз "Назад", щоб вийти на головний екран
+                // --- НОВИЙ КОД ТУТ ---
+                Thread.sleep(400)  // Коротка пауза (доля секунди) перед перемиканням
+                skipToNextTrack()  // Натискаємо "Наступний трек"
+                // ---------------------
+
                 Thread.sleep(500)
                 performGlobalAction(GLOBAL_ACTION_BACK)
             }.start()
@@ -79,6 +82,18 @@ class AutomationService : AccessibilityService() {
         audioManager.dispatchMediaKeyEvent(downEvent)
 
         val upEvent = KeyEvent(eventTime, eventTime, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PLAY, 0)
+        audioManager.dispatchMediaKeyEvent(upEvent)
+    }
+
+    private fun skipToNextTrack() {
+        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val eventTime = SystemClock.uptimeMillis()
+
+        // Емуляція натискання клавіші "Наступний трек"
+        val downEvent = KeyEvent(eventTime, eventTime, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_NEXT, 0)
+        audioManager.dispatchMediaKeyEvent(downEvent)
+
+        val upEvent = KeyEvent(eventTime, eventTime, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_NEXT, 0)
         audioManager.dispatchMediaKeyEvent(upEvent)
     }
 
