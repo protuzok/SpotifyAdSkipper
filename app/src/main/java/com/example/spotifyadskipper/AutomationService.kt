@@ -11,35 +11,54 @@ import android.view.accessibility.AccessibilityNodeInfo
 class AutomationService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
-        // 1. Чекаємо появи екрана налаштувань або діалогу
-        val packageName = event.packageName?.toString()
-
-        if (packageName == "com.android.settings") {
+        if (event.packageName == "com.android.settings" && ServiceState.isAdDetected) {
             val rootNode = rootInActiveWindow ?: return
 
-            // Шукаємо кнопку зупинки (Force stop)
-            // Використовуй список текстів для підтримки різних мов
-            val stopButtons = findNodesByTexts(rootNode, listOf("Force stop", "Зупинити", "Остановить"))
+            // 1. ПРІОРИТЕТ: Спочатку шукаємо кнопку "ОК" (підтвердження)
+            // Якщо вона є на екрані, значить діалог вже відкритий
+            val okButtons = findNodesByTexts(rootNode, listOf("OK", "ОК", "Примусово зупинити", "Force stop"))
+            // Примітка: у деяких версіях Android кнопка в діалозі називається так само, як і перша
 
-            for (node in stopButtons) {
-                if (node.isEnabled) {
+            for (node in okButtons) {
+                // Перевіряємо, чи це кнопка всередині діалогу (зазвичай вони не мають багато тексту навколо)
+                // Або просто намагаємося натиснути, якщо це OK
+                if (node.text?.toString()?.uppercase() == "OK" || node.text?.toString()?.uppercase() == "ОК") {
                     node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-                    return // Виходимо, щоб не клацати зайвого
+                    ServiceState.isAdDetected = false // Тільки тут скидаємо статус
+
+                    // Тепер можна повертатися назад, Spotify точно вбито
+                    goBackAndRestart()
+                    return
                 }
             }
 
-            // 2. Шукаємо кнопку підтвердження (OK) у спливаючому вікні
-            val okButtons = findNodesByTexts(rootNode, listOf("OK", "ОК", "Force stop", "Примусово зупинити"))
-            for (node in okButtons) {
-                node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
-
-                // Після успішної зупинки чекаємо 1 сек і запускаємо музику
-                Thread {
-                    Thread.sleep(2000)
-                    restartMusic()
-                }.start()
+            // 2. Якщо кнопки ОК не знайдено, шукаємо основну кнопку "Зупинити"
+            val stopButtons = findNodesByTexts(rootNode, listOf("Force stop", "Зупинити", "Остановить", "Примусово зупинити"))
+            for (node in stopButtons) {
+                if (node.isEnabled) {
+                    node.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+                    // ПІСЛЯ ЦЬОГО НАТИСКАННЯ НІЧОГО НЕ РОБИМО.
+                    // Чекаємо наступної події AccessibilityEvent, коли з'явиться діалог.
+                    return
+                }
             }
         }
+    }
+
+    private fun goBackAndRestart() {
+        // Робимо невелику паузу перед "Назад", щоб система зафіксувала клік по ОК
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            performGlobalAction(GLOBAL_ACTION_BACK)
+
+            Thread {
+                Thread.sleep(1000)
+                restartMusic()
+
+                // Другий раз "Назад", щоб вийти на головний екран
+                Thread.sleep(500)
+                performGlobalAction(GLOBAL_ACTION_BACK)
+            }.start()
+        }, 300)
     }
 
     private fun findNodesByTexts(root: AccessibilityNodeInfo, texts: List<String>): List<AccessibilityNodeInfo> {
@@ -52,7 +71,7 @@ class AutomationService : AccessibilityService() {
     }
 
     private fun restartMusic() {
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
         val eventTime = SystemClock.uptimeMillis()
 
         // Емуляція натискання медіа-кнопки Play

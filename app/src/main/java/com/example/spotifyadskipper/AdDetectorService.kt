@@ -64,6 +64,8 @@ class AdDetectorService : NotificationListenerService() {
     }
 
     private fun killSpotify() {
+        ServiceState.isAdDetected = true // Ставимо прапорець
+
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.fromParts("package", "com.spotify.music", null)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
