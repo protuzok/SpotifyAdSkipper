@@ -8,9 +8,14 @@ import android.view.KeyEvent
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
+import android.view.GestureDetector
+import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var gestureDetector: GestureDetector
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -22,7 +27,6 @@ class MainActivity : AppCompatActivity() {
         val btnNextTrack = findViewById<ImageButton>(R.id.btnNextTrack)
         val btnLike = findViewById<ImageButton>(R.id.btnLike)
 
-        // Логіка для переходу в налаштування
         btnAcc.setOnClickListener {
             val intent = Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
             startActivity(intent)
@@ -45,6 +49,22 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent("com.example.spotifyadskipper.ACTION_LIKE")
             sendBroadcast(intent)
             Toast.makeText(this, "Trying to save/like...", Toast.LENGTH_SHORT).show()
+        }
+
+        gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onLongPress(e: MotionEvent) {
+                super.onLongPress(e)
+                val intent = Intent(this@MainActivity, PocketModeActivity::class.java)
+                startActivity(intent)
+            }
+        })
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return if (event != null) {
+            gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
+        } else {
+            super.onTouchEvent(event)
         }
     }
 

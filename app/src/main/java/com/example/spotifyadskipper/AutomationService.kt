@@ -46,21 +46,14 @@ class AutomationService : AccessibilityService() {
 
     private fun goBackAndRestart() {
         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-            // 1. Повертаємось із налаштувань
             performGlobalAction(GLOBAL_ACTION_BACK)
 
             Thread {
-                // 2. Чекаємо довше (1.5 сек), поки система закриє вікно налаштувань і "оживе"
                 Thread.sleep(1500)
 
-                // 3. Відправляємо команду Play
                 restartMusic()
+                Thread.sleep(4000)
 
-                // 4. ЗНАЧНО ЗБІЛЬШЕНА ПАУЗА (2 - 2.5 секунди)
-                // Spotify потрібно встигнути: завантажити трек, створити сесію та почати потік
-                Thread.sleep(3000)
-
-                // 5. Тепер перемикаємо на наступний трек
                 skipToNextTrack()
             }.start()
         }, 300)
