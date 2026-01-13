@@ -90,16 +90,8 @@ class AdDetectorService : NotificationListenerService() {
     }
 
     private fun isThisAnAd(metadata: MediaMetadata, state: PlaybackState?): Boolean {
-        val title = metadata.getString(MediaMetadata.METADATA_KEY_TITLE) ?: ""
-        val artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: ""
         val duration = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION)
 
-        // 1. Базові текстові та часові маркери
-        if (artist.isEmpty() || artist.lowercase() == "spotify") return true
-        if (title.lowercase().contains("advertisement") || title.lowercase().contains("реклама")) return true
-        if (duration <= 0) return true
-
-        // 2. Аналіз дозволених дій (PlaybackState Actions)
         state?.let {
             val actions = it.actions
 
