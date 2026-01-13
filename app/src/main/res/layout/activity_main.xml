@@ -9,15 +9,6 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/btnToggle"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:text="ЗАПУСТИТИ СКРИПТ"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:backgroundTint="@android:color/holo_green_dark" />
-
-    <Button
         android:id="@+id/btnAccessibility"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -34,14 +25,5 @@
         android:backgroundTint="#000000"
         android:textColor="#FFFFFF"
         android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/btnOpenSpotify"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="ВІДКРИТИ SPOTIFY"
-        android:backgroundTint="#1DB954"
-        android:textColor="@android:color/white" />
 
 </LinearLayout>
