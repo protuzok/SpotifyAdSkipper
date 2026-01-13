@@ -26,6 +26,16 @@
         android:backgroundTint="@android:color/darker_gray" />
 
     <Button
+        android:id="@+id/btnPocketMode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="START POCKET MODE"
+        android:backgroundTint="#000000"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold" />
+
+    <Button
         android:id="@+id/btnOpenSpotify"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

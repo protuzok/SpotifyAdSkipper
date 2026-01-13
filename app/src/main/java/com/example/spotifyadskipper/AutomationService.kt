@@ -1,7 +1,6 @@
 package com.example.spotifyadskipper
 
 import android.accessibilityservice.AccessibilityService
-import android.content.Context
 import android.media.AudioManager
 import android.os.SystemClock
 import android.view.KeyEvent

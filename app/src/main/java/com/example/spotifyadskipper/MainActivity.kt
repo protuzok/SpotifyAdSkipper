@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -11,8 +12,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val btn = findViewById<Button>(R.id.btnToggle)
-        val btnAcc = findViewById<Button>(R.id.btnAccessibility) // Знаходимо нову кнопку
+        val btnAcc = findViewById<Button>(R.id.btnAccessibility)
         val btnSpotify = findViewById<Button>(R.id.btnOpenSpotify)
+        val btnPocket = findViewById<Button>(R.id.btnPocketMode)
 
         updateButtonUI(btn)
 
@@ -37,10 +39,15 @@ class MainActivity : AppCompatActivity() {
                 // Якщо додаток не встановлено, можна відкрити його в Play Store
                 val marketIntent = android.content.Intent(
                     android.content.Intent.ACTION_VIEW,
-                    android.net.Uri.parse("market://details?id=$packageName")
+                    "market://details?id=$packageName".toUri()
                 )
                 startActivity(marketIntent)
             }
+        }
+
+        btnPocket.setOnClickListener {
+            val intent = android.content.Intent(this, PocketModeActivity::class.java)
+            startActivity(intent)
         }
     }
 
