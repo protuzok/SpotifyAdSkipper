@@ -58,7 +58,7 @@ class AutomationService : AccessibilityService() {
 
                 // 4. ЗНАЧНО ЗБІЛЬШЕНА ПАУЗА (2 - 2.5 секунди)
                 // Spotify потрібно встигнути: завантажити трек, створити сесію та почати потік
-                Thread.sleep(3500)
+                Thread.sleep(3000)
 
                 // 5. Тепер перемикаємо на наступний трек
                 skipToNextTrack()
