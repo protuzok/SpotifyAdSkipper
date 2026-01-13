@@ -8,13 +8,47 @@
     android:padding="20dp"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btnAccessibility"
+    <!-- Media Controls Block -->
+    <LinearLayout
+        android:id="@+id/mediaControlsLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="ВІДКРИТИ СПЕЦ. МОЖЛИВОСТІ"
-        android:backgroundTint="@android:color/darker_gray" />
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <ImageButton
+            android:id="@+id/btnPlayPause"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Play/Pause"
+            android:src="@drawable/ic_play_arrow"
+            android:scaleType="fitCenter"
+            android:tint="#FFC107" />
+
+        <ImageButton
+            android:id="@+id/btnNextTrack"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Next Track"
+            android:src="@drawable/ic_skip_next"
+            android:scaleType="fitCenter"
+            android:tint="#FFC107"/>
+
+        <ImageButton
+            android:id="@+id/btnLike"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Like Song"
+            android:src="@drawable/ic_favorite"
+            android:scaleType="fitCenter"
+            android:tint="#FFC107"/>
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnPocketMode"
@@ -25,5 +59,18 @@
         android:backgroundTint="#000000"
         android:textColor="#FFFFFF"
         android:textStyle="bold" />
+
+    <!-- Spacer for ~1/4 screen height -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="120dp"/>
+
+    <Button
+        android:id="@+id/btnAccessibility"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:text="ВІДКРИТИ СПЕЦ. МОЖЛИВОСТІ"
+        android:backgroundTint="@android:color/darker_gray" />
 
 </LinearLayout>

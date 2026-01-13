@@ -7,19 +7,73 @@ import android.media.session.MediaController
 import android.media.session.MediaSession
 import android.media.session.PlaybackState
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import androidx.core.content.ContextCompat
 
 class AdDetectorService : NotificationListenerService() {
 
+    private val likeReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: android.content.Context?, intent: Intent?) {
+            if (intent?.action == "com.example.spotifyadskipper.ACTION_LIKE") {
+                triggerLikeAction()
+            }
+        }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        val filter = android.content.IntentFilter("com.example.spotifyadskipper.ACTION_LIKE")
+
+        ContextCompat.registerReceiver(
+            this,
+            likeReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(likeReceiver)
+    }
+
+    private fun triggerLikeAction() {
+        try {
+            val notifications = activeNotifications
+            for (sbn in notifications) {
+                if (sbn.packageName == "com.spotify.music") {
+                    val extras = sbn.notification.extras
+                    val token = getMediaSessionToken(extras)
+                    if (token != null) {
+                        val controller = MediaController(this, token)
+                        val playbackState = controller.playbackState ?: continue
+                        val customActions = playbackState.customActions
+
+                        for (action in customActions) {
+                            val actionName = action.action.toString().lowercase()
+                            if (actionName.contains("add_to")) {
+                                controller.transportControls.sendCustomAction(action, null)
+                                Log.d("SpotifyAdSkipper", "Triggered custom action: ${action.name}")
+                                return
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("SpotifyAdSkipper", "Error triggering like action", e)
+        }
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        // Виправлено пакет на стандартний для Spotify
         if (sbn.packageName != "com.spotify.music") return
 
         val extras = sbn.notification.extras
-        val token = extras.getParcelable<MediaSession.Token>(Notification.EXTRA_MEDIA_SESSION)
+        val token = getMediaSessionToken(extras)
 
         if (token != null) {
             val controller = MediaController(this, token)
@@ -72,5 +126,14 @@ class AdDetectorService : NotificationListenerService() {
             addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
         }
         startActivity(intent)
+    }
+
+    private fun getMediaSessionToken(extras: android.os.Bundle): MediaSession.Token? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            extras.getParcelable(Notification.EXTRA_MEDIA_SESSION, MediaSession.Token::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            extras.getParcelable(Notification.EXTRA_MEDIA_SESSION)
+        }
     }
 }
