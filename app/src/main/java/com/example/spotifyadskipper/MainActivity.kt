@@ -8,14 +8,11 @@ import android.view.KeyEvent
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Toast
-import android.view.GestureDetector
+
 import android.view.MotionEvent
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var gestureDetector: GestureDetector
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -51,21 +48,32 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Trying to save/like...", Toast.LENGTH_SHORT).show()
         }
 
-        gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onLongPress(e: MotionEvent) {
-                super.onLongPress(e)
-                val intent = Intent(this@MainActivity, PocketModeActivity::class.java)
-                startActivity(intent)
-            }
-        })
+
     }
 
+    // Triple tap variables
+    private var tapCount = 0
+    private var lastTapTime: Long = 0
+    private val TAP_THRESHOLD = 400L // ms between taps
+
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        return if (event != null) {
-            gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
-        } else {
-            super.onTouchEvent(event)
+        if (event?.action == MotionEvent.ACTION_DOWN) {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastTapTime < TAP_THRESHOLD) {
+                tapCount++
+            } else {
+                tapCount = 1
+            }
+            lastTapTime = currentTime
+
+            if (tapCount >= 3) {
+                val intent = Intent(this, PocketModeActivity::class.java)
+                startActivity(intent)
+                tapCount = 0 // Reset
+            }
+            return true
         }
+        return super.onTouchEvent(event)
     }
 
     private fun sendMediaKeyEvent(keyCode: Int) {
