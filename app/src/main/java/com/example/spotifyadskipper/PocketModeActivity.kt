@@ -1,7 +1,7 @@
 package com.example.spotifyadskipper
 
 import android.os.Bundle
-import android.view.GestureDetector
+
 import android.view.MotionEvent
 import android.view.WindowManager
 import android.widget.Toast
@@ -12,7 +12,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 
 class PocketModeActivity : AppCompatActivity() {
 
-    private lateinit var gestureDetector: GestureDetector
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,13 +29,7 @@ class PocketModeActivity : AppCompatActivity() {
         hideSystemUI()
 
         // 4. Setup Long Press Listener
-        gestureDetector = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
-            override fun onLongPress(e: MotionEvent) {
-                super.onLongPress(e)
-                Toast.makeText(applicationContext, "Exiting Pocket Mode", Toast.LENGTH_SHORT).show()
-                finish() // Exit activity
-            }
-        })
+
     }
 
     private fun setMinimalBrightness() {
@@ -52,13 +46,29 @@ class PocketModeActivity : AppCompatActivity() {
         }
     }
 
+    // Triple tap variables
+    private var tapCount = 0
+    private var lastTapTime: Long = 0
+    private val TAP_THRESHOLD = 400L // ms between taps
+
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        // Pass events to gesture detector
-        return if (event != null) {
-            gestureDetector.onTouchEvent(event) || super.onTouchEvent(event)
-        } else {
-            super.onTouchEvent(event)
+        if (event?.action == MotionEvent.ACTION_DOWN) {
+            val currentTime = System.currentTimeMillis()
+            if (currentTime - lastTapTime < TAP_THRESHOLD) {
+                tapCount++
+            } else {
+                tapCount = 1
+            }
+            lastTapTime = currentTime
+
+            if (tapCount >= 3) {
+                Toast.makeText(applicationContext, "Exiting Pocket Mode", Toast.LENGTH_SHORT).show()
+                finish()
+                tapCount = 0 // Reset
+            }
+            return true
         }
+        return super.onTouchEvent(event)
     }
     
     // If the window loses focus (e.g. Settings opened), and then we come back:
